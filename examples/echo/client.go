@@ -8,6 +8,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -16,6 +17,13 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+
+type imeter struct {
+	PhaseVoltageR, PhaseVoltageS, PhaseVoltageT float64
+	KWatth                                      float64
+	time                                        string
+	timestamp                                   int64
+}
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
 
@@ -26,7 +34,7 @@ func main() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	u := url.URL{Scheme: "ws", Host: *addr, Path: "/echo"}
+	u := url.URL{Scheme: "ws", Host: *addr, Path: "/report"}
 	log.Printf("connecting to %s", u.String())
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -57,7 +65,13 @@ func main() {
 		case <-done:
 			return
 		case t := <-ticker.C:
-			err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
+			m := imeter{}
+
+			m.time = t.String()
+			m.timestamp = t.Unix()
+			fmt.Printf("Sending %#v\n", m)
+			err := c.WriteJSON(m)
+			// err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
 			if err != nil {
 				log.Println("write:", err)
 				return
