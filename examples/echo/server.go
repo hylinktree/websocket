@@ -8,6 +8,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -42,6 +43,11 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type imeter struct {
+	PhaseVoltageR, PhaseVoltageS, PhaseVoltageT float64
+	KWatth                                      float64
+}
+
 func report(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -50,18 +56,21 @@ func report(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	for {
+		m := imeter{}
+		err := c.ReadJSON(&m)
 
-		mt, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
 			break
 		}
-		log.Printf("recv: %s", message)
-		err = c.WriteMessage(mt, message)
-		if err != nil {
-			log.Println("write:", err)
-			break
-		}
+		fmt.Printf("Got message: %#v\n", m)
+
+		// if err = conn.WriteJSON(m); err != nil {
+		// 	fmt.Println(err)
+		// }		if err != nil {
+		// 	log.Println("write:", err)
+		// 	break
+		// }
 	}
 }
 
