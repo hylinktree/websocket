@@ -27,8 +27,15 @@ type imeter struct {
 var addr = flag.String("addr", "localhost:8080", "http service address")
 
 func main() {
-	flag.Parse()
-	log.SetFlags(0)
+	wiscmd := flag.NewFlagSet("wiscon", flag.ExitOnError)
+	pinterval := wiscmd.Int64("i", 1000, "interval in ms")
+
+	fmt.Println(os.Args)
+	wiscmd.Parse(os.Args[1:])
+	fmt.Println("interval is", *pinterval)
+
+	// flag.Parse()
+	// log.SetFlags(0)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -56,7 +63,9 @@ func main() {
 		}
 	}()
 
-	ticker := time.NewTicker(time.Second)
+	dur := time.Duration(*pinterval)
+	fmt.Println("duration is", dur)
+	ticker := time.NewTicker(dur * time.Millisecond)
 	defer ticker.Stop()
 
 	for {

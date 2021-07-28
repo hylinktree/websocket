@@ -56,24 +56,24 @@ func report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
+	var m imeter
 	for {
-		m := imeter{}
-		// var m imeter
-		err := c.ReadJSON(&m)
+		// m := imeter{}
+		//
 
-		if err != nil {
+		if err := c.ReadJSON(&m); err != nil {
 			log.Println("read:", err)
 			break
 		}
 		fmt.Printf("Got message: [%#v]\n", m)
 		m.Timestamp = -m.Timestamp
-		msg := fmt.Sprintf("%#v", m)
-		fmt.Printf("to send message: [%s]\n", msg)
+		// msg := fmt.Sprintf("%#v", m)
+		// fmt.Printf("to send message: [%s]\n", msg)
+		// err = c.WriteMessage(websocket.TextMessage, []byte(msg))
 
-		err = c.WriteMessage(websocket.TextMessage, []byte(msg))
-
-		// if err = conn.WriteJSON(m); err != nil {
-		// 	fmt.Println(err)
+		if err = c.WriteJSON(m); err != nil {
+			fmt.Println(err)
+		}
 		// }		if err != nil {
 		// 	log.Println("write:", err)
 		// 	break
