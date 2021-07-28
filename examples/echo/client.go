@@ -24,6 +24,10 @@ type imeter struct {
 	KWatth                                      float64
 }
 
+func makeJavaTimestamp(t time.Time) int64 {
+	return int64(time.Nanosecond) * t.UnixNano() / int64(time.Millisecond)
+}
+
 var addr = flag.String("addr", "localhost:8080", "http service address")
 
 func main() {
@@ -76,7 +80,7 @@ func main() {
 			m := imeter{0, 1.1, 2.2, 3.3, 4.4}
 
 			// m.time = t.String()
-			m.Timestamp = t.Unix()
+			m.Timestamp = makeJavaTimestamp(t) //t.UnixNano()
 			fmt.Printf("Sending [%#v]\n", m)
 			err := c.WriteJSON(m)
 			// err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
