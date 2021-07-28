@@ -57,6 +57,7 @@ func report(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	var m imeter
+	cnt := 0
 	for {
 		// m := imeter{}
 		//
@@ -65,7 +66,10 @@ func report(w http.ResponseWriter, r *http.Request) {
 			log.Println("read:", err)
 			break
 		}
-		fmt.Printf("Got message: [%#v]\n", m)
+		cnt++
+		if (cnt % 1000) == 0 {
+			fmt.Printf("Got message: [%#v]\n", m)
+		}
 		m.Timestamp = -m.Timestamp
 		// msg := fmt.Sprintf("%#v", m)
 		// fmt.Printf("to send message: [%s]\n", msg)

@@ -8,7 +8,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -54,6 +53,7 @@ func main() {
 	defer c.Close()
 
 	done := make(chan struct{})
+	cnt := 0
 
 	go func() {
 		defer close(done)
@@ -63,13 +63,14 @@ func main() {
 				log.Println("read:", err)
 				return
 			}
-			log.Printf("recv: %s", message)
+			cnt++
+			if (cnt % 100) == 0 {
+				log.Printf("%d.recv: %s", cnt, message)
+			}
 		}
 	}()
 
-	dur := time.Duration(*interval)
-	fmt.Println("duration is", dur)
-	ticker := time.NewTicker(dur * time.Millisecond)
+	ticker := time.NewTicker(time.Duration(*interval) * time.Millisecond)
 	defer ticker.Stop()
 
 	for {
@@ -77,17 +78,19 @@ func main() {
 		case <-done:
 			return
 		case t := <-ticker.C:
+
 			m := imeter{0, 1.1, 2.2, 3.3, 4.4}
 
 			// m.time = t.String()
 			m.Timestamp = makeJavaTimestamp(t) //t.UnixNano()
-			fmt.Printf("Sending [%#v]\n", m)
+			// fmt.Printf("Sending [%#v]\n", m)
 			err := c.WriteJSON(m)
 			// err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
 			if err != nil {
 				log.Println("write:", err)
 				return
 			}
+
 		case <-interrupt:
 			log.Println("interrupt")
 
