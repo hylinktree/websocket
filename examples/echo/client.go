@@ -19,10 +19,9 @@ import (
 )
 
 type imeter struct {
+	Timestamp                                   int64
 	PhaseVoltageR, PhaseVoltageS, PhaseVoltageT float64
-	Xtimestamp                                  float64
 	KWatth                                      float64
-	// time                                        string
 }
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
@@ -64,11 +63,11 @@ func main() {
 		select {
 		case <-done:
 			return
-		case <-ticker.C:
-			m := imeter{1.1, 2.2, 3.3, 4.4, 777}
+		case t := <-ticker.C:
+			m := imeter{0, 1.1, 2.2, 3.3, 4.4}
 
 			// m.time = t.String()
-			// m.timestamp = float64(t.Unix())
+			m.Timestamp = t.Unix()
 			fmt.Printf("Sending [%#v]\n", m)
 			err := c.WriteJSON(m)
 			// err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))

@@ -44,10 +44,9 @@ func echo(w http.ResponseWriter, r *http.Request) {
 }
 
 type imeter struct {
+	Timestamp                                   int64
 	PhaseVoltageR, PhaseVoltageS, PhaseVoltageT float64
-	Xtimestamp                                  float64
 	KWatth                                      float64
-	// time                                        string
 }
 
 func report(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +66,7 @@ func report(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		fmt.Printf("Got message: [%#v]\n", m)
-		m.Xtimestamp = -m.Xtimestamp
+		m.Timestamp = -m.Timestamp
 		msg := fmt.Sprintf("%#v", m)
 		fmt.Printf("to send message: [%s]\n", msg)
 
