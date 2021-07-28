@@ -45,9 +45,9 @@ func echo(w http.ResponseWriter, r *http.Request) {
 
 type imeter struct {
 	PhaseVoltageR, PhaseVoltageS, PhaseVoltageT float64
+	Xtimestamp                                  float64
 	KWatth                                      float64
-	time                                        string
-	timestamp                                   int64
+	// time                                        string
 }
 
 func report(w http.ResponseWriter, r *http.Request) {
@@ -58,16 +58,16 @@ func report(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	for {
-		// m := imeter{}
-		var m imeter
+		m := imeter{}
+		// var m imeter
 		err := c.ReadJSON(&m)
 
 		if err != nil {
 			log.Println("read:", err)
 			break
 		}
-		fmt.Printf("Got message: %#v\n", m)
-		m.timestamp = 9999
+		fmt.Printf("Got message: [%#v]\n", m)
+		m.Xtimestamp = -m.Xtimestamp
 		msg := fmt.Sprintf("%#v", m)
 		fmt.Printf("to send message: [%s]\n", msg)
 
