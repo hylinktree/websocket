@@ -33,10 +33,10 @@ func main() {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
-	// err := http.ListenAndServe(*addr, nil)
-	certfile := "certfile"
-	keyfile := "keyfile"
-	err := http.ListenAndServeTLS(*addr, certfile, keyfile, nil)
+	err := http.ListenAndServe(*addr, nil)
+	// certfile := "certfile"
+	// keyfile := "keyfile"
+	// err := http.ListenAndServeTLS(*addr, certfile, keyfile, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
