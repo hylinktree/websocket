@@ -29,16 +29,16 @@ func makeJavaTimestamp(t time.Time) int64 {
 }
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
+var interval = flag.Int64("i", 1000, "interval in ms")
 
 func main() {
-	wiscmd := flag.NewFlagSet("wiscon", flag.ExitOnError)
-	pinterval := wiscmd.Int64("i", 1000, "interval in ms")
+	// wiscmd := flag.NewFlagSet("wiscon", flag.ExitOnError)
 
-	fmt.Println(os.Args)
-	wiscmd.Parse(os.Args[1:])
-	fmt.Println("interval is", *pinterval)
+	// fmt.Println(os.Args)
+	// wiscmd.Parse(os.Args[1:])
+	// fmt.Println("interval is", *pinterval)
 
-	// flag.Parse()
+	flag.Parse()
 	// log.SetFlags(0)
 
 	interrupt := make(chan os.Signal, 1)
@@ -67,7 +67,7 @@ func main() {
 		}
 	}()
 
-	dur := time.Duration(*pinterval)
+	dur := time.Duration(*interval)
 	fmt.Println("duration is", dur)
 	ticker := time.NewTicker(dur * time.Millisecond)
 	defer ticker.Stop()
