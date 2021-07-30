@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -65,7 +66,9 @@ func getconn() {
 	// As you set the timeout, it is expected the operation should be completed within the time!!
 	// ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	// defer cancel()
-	clientOptions := options.Client().ApplyURI(mongouri)
+	uri := "mongodb://admin:secret@" + *host + ":" + *port
+	// "mongodb://admin:secret@hpcargo:27017"
+	clientOptions := options.Client().ApplyURI(uri)
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(ctx, clientOptions)
@@ -79,7 +82,7 @@ func getconn() {
 		fmt.Println("disconnected!")
 	}()
 
-	for i := 0; i < 999999; i++ {
+	for i := 0; i < *runs; i++ {
 		ash := Trainer{"Ash", 10, "Pallet Town", randvoltage(), randvoltage(), randvoltage()}
 		collection := client.Database("test").Collection("trainers")
 
@@ -104,7 +107,14 @@ func getconn() {
 	fmt.Println("Connected to MongoDB!")
 }
 
+var (
+	host = flag.String("host", "hpcargo", "host")
+	port = flag.String("port", "27017", "port")
+	runs = flag.Int("runs", 1, "total runs")
+)
+
 func main() {
-	// Rest of the code will go here
+
+	flag.Parse()
 	getconn()
 }
