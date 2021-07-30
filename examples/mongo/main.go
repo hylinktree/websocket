@@ -20,7 +20,7 @@ type Trainer struct {
 }
 
 const (
-	mongouri = "mongodb://admin:secret@hpcargo:27017"
+	mongouri = "mongodb://admin:secret@hpcargo:27018"
 )
 
 func randvoltage() float64 {
@@ -36,18 +36,21 @@ func getconn() {
 		timeout = 90
 	)
 	ticker := time.NewTicker(time.Second)
+	timer := time.After(time.Second * timeout)
 	go func() {
 		i := 0
 	p001:
 		for {
+			fmt.Println("looping")
 			select {
+			// case <-time.After(time.Second * 3): NOT WORK IF W/ TICKER
+			case <-timer:
+				fmt.Println("time is up", i)
+				ticker.Stop()
+				break p001
 			case t := <-ticker.C:
 				fmt.Println(i, t)
 				i++
-			case <-time.After(time.Second * 3):
-				fmt.Println("time is up")
-				ticker.Stop()
-				break p001
 			}
 		}
 	}()
@@ -55,6 +58,8 @@ func getconn() {
 	// a := context.Background()
 	// fmt.Println(a)
 	// fmt.Println(context.TODO())
+
+	// As you set the timeout, it is expected the operation should be completed within the time!!
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	defer cancel()
 	clientOptions := options.Client().ApplyURI(mongouri)
