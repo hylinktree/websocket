@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,14 +13,23 @@ import (
 
 // You will be using this Trainer type later in the program
 type Trainer struct {
-	Name string
-	Age  int
-	City string
+	Name                         string
+	Age                          int
+	City                         string
+	VoltageR, VoltageS, VoltageT float64
 }
 
 const (
 	mongouri = "mongodb://admin:secret@hpcargo:27017"
 )
+
+func randvoltage() float64 {
+	const (
+		min = 98.0
+		max = 120.0
+	)
+	return min + rand.Float64()*(max-min)
+}
 
 func getconn() {
 	// Set client options
@@ -42,15 +52,20 @@ func getconn() {
 		fmt.Println("disconnected!")
 	}()
 
-	ash := Trainer{"Ash", 10, "Pallet Town"}
-	collection := client.Database("test").Collection("trainers")
+	for i := 0; i < 999999; i++ {
+		ash := Trainer{"Ash", 10, "Pallet Town", randvoltage(), randvoltage(), randvoltage()}
+		collection := client.Database("test").Collection("trainers")
 
-	insertResult, err := collection.InsertOne(ctx, ash)
-	if err != nil {
-		log.Fatal(err)
+		_, err := collection.InsertOne(ctx, ash)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if (i % 1000) == 0 {
+			fmt.Printf("%d records sent\n", i)
+		}
 	}
 
-	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
+	// fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 
 	// Check the connection
 	err = client.Ping(ctx, nil)
