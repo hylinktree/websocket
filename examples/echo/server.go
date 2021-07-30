@@ -50,17 +50,17 @@ type imeter struct {
 }
 
 func report(w http.ResponseWriter, r *http.Request) {
-    defer func(){
-        fmt.Println("report.fin")
-    }
+	defer func() {
+		fmt.Println("report.fin")
+	}()
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
 		return
 	}
-    defer func(){
-        fmt.Println("conn.closed")
-    }
+	defer func() {
+		fmt.Println("conn.closed")
+	}()
 	defer c.Close()
 	var m imeter
 	cnt := 0
