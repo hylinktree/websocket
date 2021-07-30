@@ -32,11 +32,30 @@ func randvoltage() float64 {
 }
 
 func getconn() {
+	const (
+		timeout = 90
+	)
+	ticker := time.NewTicker(time.Second)
+	go func() {
+		i := 0
+	p001:
+		for {
+			select {
+			case t := <-ticker.C:
+				fmt.Println(i, t)
+				i++
+			case <-time.After(time.Second * 3):
+				fmt.Println("time is up")
+				ticker.Stop()
+				break p001
+			}
+		}
+	}()
 	// Set client options
 	// a := context.Background()
 	// fmt.Println(a)
 	// fmt.Println(context.TODO())
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
 	defer cancel()
 	clientOptions := options.Client().ApplyURI(mongouri)
 
