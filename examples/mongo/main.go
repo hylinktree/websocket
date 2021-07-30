@@ -18,13 +18,14 @@ type Trainer struct {
 }
 
 const (
-	mongouri = "mongodb://hpcargo:27017"
+	mongouri = "mongodb://admin:secret@hpcargo:27017"
 )
 
 func getconn() {
 	// Set client options
-	fmt.Println(context.Background())
-	fmt.Println(context.TODO())
+	// a := context.Background()
+	// fmt.Println(a)
+	// fmt.Println(context.TODO())
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	clientOptions := options.Client().ApplyURI(mongouri)
@@ -36,10 +37,23 @@ func getconn() {
 		log.Fatal(err)
 	}
 
-	defer client.Disconnect(ctx)
+	defer func() {
+		client.Disconnect(ctx)
+		fmt.Println("disconnected!")
+	}()
+
+	ash := Trainer{"Ash", 10, "Pallet Town"}
+	collection := client.Database("test").Collection("trainers")
+
+	insertResult, err := collection.InsertOne(ctx, ash)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 
 	// Check the connection
-	err = client.Ping(context.TODO(), nil)
+	err = client.Ping(ctx, nil)
 
 	if err != nil {
 		log.Fatal(err)
