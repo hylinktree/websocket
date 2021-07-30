@@ -71,6 +71,7 @@ func getconn() {
 	clientOptions := options.Client().ApplyURI(uri)
 
 	// Connect to MongoDB
+	fmt.Println("connecting to", uri)
 	client, err := mongo.Connect(ctx, clientOptions)
 
 	if err != nil {
@@ -81,8 +82,9 @@ func getconn() {
 		client.Disconnect(ctx)
 		fmt.Println("disconnected!")
 	}()
+	var i = 0
 
-	for i := 0; i < *runs; i++ {
+	for ; i < *runs; i++ {
 		ash := Trainer{"Ash", 10, "Pallet Town", randvoltage(), randvoltage(), randvoltage()}
 		collection := client.Database("test").Collection("trainers")
 
@@ -90,10 +92,11 @@ func getconn() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if (i % 1000) == 0 {
+		if i != 0 && (i%1000) == 0 {
 			fmt.Printf("%d records sent\n", i)
 		}
 	}
+	fmt.Printf("total %d records sent\n", i)
 
 	// fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 
