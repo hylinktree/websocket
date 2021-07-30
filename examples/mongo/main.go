@@ -126,9 +126,25 @@ var (
 	runs       = flag.Int("runs", 1, "total runs")
 	database   = flag.String("db", "postgres", "the database for run")
 	collection = flag.String("co", "meter101", "the collection for run")
+	year       = flag.Int("year", 0, "adjust year offset")
 )
 
 func getconn2() {
+	// var epoch int64
+
+	starttime := time.Now().AddDate(*year, 0, 0)
+	fmt.Println("report time from", starttime)
+
+	epoch := starttime.Unix()
+
+	// if *year == 0 {
+	// 	// *year = time.Now().Year()
+	// 	epoch = time.Now().Unix()
+	// } else {
+	// 	epoch = time.Now().AddDate(*year, 0, 0).Unix()
+	// 	// now.Add(time.Duration()) // .Year = *year
+	// 	// epoch = now.Unix()
+	// }
 
 	ctx := context.TODO()
 	// As you set the timeout, it is expected the operation should be completed within the time!!
@@ -157,28 +173,30 @@ func getconn2() {
 
 		var err error
 
-		_, err = collection.InsertOne(ctx, bson.D{
-			{"voltageR", randvoltage()},
-			{"voltageS", randvoltage()},
-			{"voltageT", randvoltage()},
-			{"timeStamp", time.Now().Unix()}, //makeJavaTimestamp(time.Now())},
-		})
+		var lst []interface{}
+		for j := 0; j < 10; j++ {
 
-		if err != nil {
-			log.Fatal(err)
+			lst = append(lst, bson.D{
+				{"voltageR", randvoltage()},
+				{"voltageS", randvoltage()},
+				{"voltageT", randvoltage()},
+				{"timeStamp", epoch}})
+			epoch++
 		}
-		_, err = collection.InsertMany(ctx, []interface{}{
-			bson.D{
-				{"voltageR", randvoltage()},
-				{"voltageS", randvoltage()},
-				{"voltageT", randvoltage()},
-				{"timeStamp", time.Now().Unix()}}, //makeJavaTimestamp(time.Now())},
-			bson.D{
-				{"voltageR", randvoltage()},
-				{"voltageS", randvoltage()},
-				{"voltageT", randvoltage()},
-				{"timeStamp", time.Now().Unix()}},
-		})
+
+		_, err = collection.InsertMany(ctx, lst)
+		// 	[]interface{}{
+		// 	bson.D{
+		// 		{"voltageR", randvoltage()},
+		// 		{"voltageS", randvoltage()},
+		// 		{"voltageT", randvoltage()},
+		// 		{"timeStamp", time.Now().Unix()}}, //makeJavaTimestamp(time.Now())},
+		// 	bson.D{
+		// 		{"voltageR", randvoltage()},
+		// 		{"voltageS", randvoltage()},
+		// 		{"voltageT", randvoltage()},
+		// 		{"timeStamp", time.Now().Unix()}},
+		// })
 
 		// _, err := collection.InsertMany(ctx, []interface{}{
 		// 	bson.D{
@@ -209,6 +227,7 @@ func getconn2() {
 func makeJavaTimestamp(t time.Time) int64 {
 	return int64(time.Nanosecond) * t.UnixNano() / int64(time.Millisecond)
 }
+
 func main() {
 
 	flag.Parse()

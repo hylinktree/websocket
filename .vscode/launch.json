@@ -18,6 +18,7 @@
         "program": "${workspaceRoot}/examples/mongo/main.go",
         "stopOnEntry": false,
         "args": [
+          "-year", "-3"
           //"-query", "etcd/serv"
           // "runcli", "--count", "3"
         //   "runsrv", "--count", "3"
