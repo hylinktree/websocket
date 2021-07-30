@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -22,16 +23,20 @@ const (
 
 func getconn() {
 	// Set client options
+	fmt.Println(context.Background())
+	fmt.Println(context.TODO())
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	clientOptions := options.Client().ApplyURI(mongouri)
 
 	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := mongo.Connect(ctx, clientOptions)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer client.Close()
+	defer client.Disconnect(ctx)
 
 	// Check the connection
 	err = client.Ping(context.TODO(), nil)
