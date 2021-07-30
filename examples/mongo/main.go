@@ -130,11 +130,9 @@ var (
 )
 
 func getconn2() {
-	// var epoch int64
 
 	starttime := time.Now().AddDate(*year, 0, 0)
 	fmt.Println("report time from", starttime)
-
 	epoch := starttime.Unix()
 
 	// if *year == 0 {
